@@ -7,7 +7,7 @@ const registerUser = async (req, res) => {
     const user = await User.create(req.body)
 
     const token = user.createJWT();
-    res.status(StatusCodes.OK).json({ msg: 'User created successfully' })
+    res.status(StatusCodes.OK).json({ success: true, name: user.name, token: token });
 }
 
 const login = async (req, res) => {
@@ -23,8 +23,13 @@ const login = async (req, res) => {
         res.send(`No user found`)
     }
 
+    const isPaswordCorrect = await user.comparePassword(password)
+    if (!isPaswordCorrect) {
+        res.send('Wrong password')
+    }
+
     const token = user.createJWT()
-    res.status(StatusCodes.OK).json({user:user, token:token})
+    res.status(StatusCodes.OK).json({name:user.name, token:token})
 }
 
 module.exports = {registerUser, login}

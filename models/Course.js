@@ -1,18 +1,23 @@
 const mongoose = require('mongoose')
 
 const CourseSchema = new mongoose.Schema({
-    name: {
+    course: {
         type: String,
         required: [true, 'Please provide name'],
         maxlength: 30
+    },
+    profile:{
+        type:String,
+        required:[true, "Please provide profile link"]
     },
     university: {
         type: String,
         required: [true, 'Please provide university name'],
         maxlength: 30
     },
-    profile: {
-        type: String
+    image: {
+        type: String,
+        required:[true, 'Please provide image url']
     },
     duration: {
         type: Number,
@@ -21,6 +26,10 @@ const CourseSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: [true, 'Please provide price']
+    },
+    certificate:{
+        type:String,
+        required:[true, 'Please provide certificate url']
     },
     criteria: {
         type: String,
@@ -32,6 +41,5 @@ const CourseSchema = new mongoose.Schema({
         required: [true, 'Please provide user'],
     }
 },{timestamps:true})
-
 
 module.exports = mongoose.model('course', CourseSchema)

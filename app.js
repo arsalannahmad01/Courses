@@ -9,10 +9,12 @@ const userRouter = require('./routes/users')
 
 const connectDB = require('./db/connect')
 
+const authMiddleware = require('./middleware/authentication')
+
 app.use(express.json())
 
 app.use('/api/v1/users', userRouter)
-app.use('/api/v1/courses', courseRouter)
+app.use('/api/v1/courses', authMiddleware, courseRouter)
 
 const port = process.env.PORT || 3000
 
