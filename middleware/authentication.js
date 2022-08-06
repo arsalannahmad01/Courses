@@ -1,15 +1,12 @@
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
-// const { UnauthenticatedError } = require('../errors')
+const { UnauthenticatedError } = require('../errors')
 
 const authMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization
 
-    // console.log(authHeader);
-
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        // throw new UnauthenticatedError('Authentication invalid')
-        res.send('Authentication Invalid')
+        throw new UnauthenticatedError('Authentication invalid')
     }
 
     const token = authHeader.split(' ')[1]
@@ -19,9 +16,8 @@ const authMiddleware = async (req, res, next) => {
         req.user = user
         next()
     } catch (error) {
-        res.send('Authentication Invalid')
-        // throw new UnauthenticatedError('Authentication invalid')
-    }
+        throw new UnauthenticatedError('Authentication invalid')
+    }  
 }
 
 module.exports = authMiddleware

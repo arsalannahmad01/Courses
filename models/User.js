@@ -9,23 +9,29 @@ const UserSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: [true, 'Please provide email']
+        required: [true, 'Please provide email'],
+        match: [
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            'Please provide valid email'
+        ],
+        unique: true
     },
     password: {
         type: String,
-        required: [true, 'Please provide password']
+        required: [true, 'Please provide password'],
+        minlength: 6
     }
-},{timestamps:true})
+}, { timestamps: true })
 
 UserSchema.pre('save', function (next) {
+    if (this.isModified('password')) return next()
 
-    if (this.isModified('password')) {
-        bcrypt.hash(this.password, 10, (err, hash) => {
-            if (err) return (err);
-
-            this.password = hash;
-            next();
-        })
+    try {
+        const salt = await bcrypt.genSalt(10)
+        this.password = await bcrypt.hash(this.password, salt)
+        return next()
+    } catch (error) {
+        return next(error)
     }
 })
 
@@ -41,11 +47,8 @@ UserSchema.methods.comparePassword = async function (password) {
 }
 
 UserSchema.methods.createJWT = function () {
-    return jwt.sign({ 
-        email: this.email, id: this._id, }, 
-        process.env.JWT_SECRET, 
-        { expiresIn: process.env.JWT_LIFETIME 
-    })
+    return jwt.sign({ email: this.email, id: this._id }, process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_LIFETIME })
 }
 
 module.exports = mongoose.model('user', UserSchema)

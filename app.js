@@ -10,11 +10,17 @@ const userRouter = require('./routes/users')
 const connectDB = require('./db/connect')
 
 const authMiddleware = require('./middleware/authentication')
+const apiNotFoundMiddleware = require('./middleware/not-found')
+const errorHandlerMiddleware = require('./middleware/error-handler')
 
 app.use(express.json())
 
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/courses', authMiddleware, courseRouter)
+
+
+app.use(apiNotFoundMiddleware)
+app.use(errorHandlerMiddleware)
 
 const port = process.env.PORT || 3000
 
@@ -24,7 +30,7 @@ const start = async () => {
         console.log('Database connection established...')
         app.listen(port, console.log(`Server is listening on port ${port}...`))
     } catch (error) {
-        console.log(`Error connecting to db: ${error}`);
+        console.log(`Error connecting to db: ${error}`)
     }
 }
 
